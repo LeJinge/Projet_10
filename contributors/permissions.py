@@ -24,3 +24,12 @@ class IsProjectViewer(BasePermission):
         # Vérifie si l'utilisateur est un spectateur du projet
         return obj.contributors.filter(user=request.user, role='Viewer').exists()
 
+
+class IsAssignee(BasePermission):
+    """ Autorise l'assignee à effectuer certaines actions sur l'issue. """
+
+    def has_object_permission(self, request, view, obj):
+        # Vérifie si l'utilisateur est l'assignee de l'issue
+        return obj.assignee == request.user
+
+

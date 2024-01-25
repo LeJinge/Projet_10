@@ -19,6 +19,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from contributors.views import ContributorViewSet
+from issues.views import IssueViewSet
 from projects.views import ProjectViewSet
 from users.views import UserViewSet, AuthViewSet, CustomUserViewSet
 
@@ -28,6 +29,7 @@ router.register(r'auth', AuthViewSet, basename='auth')
 router.register(r'user-actions', CustomUserViewSet, basename='user-actions')
 router.register(r'projects', ProjectViewSet)
 router.register(r'contributors', ContributorViewSet)
+router.register(r'issues', IssueViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

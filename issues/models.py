@@ -12,13 +12,13 @@ class Issue(models.Model):
         ('FEA', 'Feature'),
     ]
 
-    ISSUE_STATUS = [
+    ISSUE_PRIORITY = [
         ('LOW', 'Low'),
         ('MED', 'Medium'),
         ('HIG', 'High'),
     ]
 
-    ISSUE_PRIORITY = [
+    ISSUE_STATUS = [
         ('TODO', 'To do'),
         ('PRO', 'In progress'),
         ('FIN', 'Finished'),
@@ -29,8 +29,8 @@ class Issue(models.Model):
     creation_date = models.DateField(auto_now_add=True)
     last_update = models.DateField(auto_now=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    status = models.CharField(max_length=3, choices=ISSUE_STATUS)
-    priority = models.CharField(max_length=4, choices=ISSUE_PRIORITY, default='TODO')
+    status = models.CharField(max_length=4, choices=ISSUE_STATUS, default='TODO')
+    priority = models.CharField(max_length=3, choices=ISSUE_PRIORITY)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     assignee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='assignee', null=True, blank=True)
 
