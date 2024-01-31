@@ -7,7 +7,7 @@ from projects.models import Project
 class IsProjectAuthor(BasePermission):
     def has_object_permission(self, request, view, obj):
         # Vérifie si l'utilisateur est l'auteur du projet
-        return obj.author == request.user
+        return obj.project.author == request.user
 
 
 class IsProjectAdministrator(BasePermission):
