@@ -3,6 +3,7 @@ from django.db import models
 from projects.models import Project
 from users.models import CustomUser
 
+
 # Create your models here.
 class Issue(models.Model):
     """Issue model"""

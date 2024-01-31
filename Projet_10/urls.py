@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+from comments.views import CommentViewSet
 from contributors.views import ContributorViewSet
 from issues.views import IssueViewSet
 from projects.views import ProjectViewSet
@@ -30,10 +31,9 @@ router.register(r'user-actions', CustomUserViewSet, basename='user-actions')
 router.register(r'projects', ProjectViewSet)
 router.register(r'contributors', ContributorViewSet)
 router.register(r'issues', IssueViewSet)
+router.register(r'comment', CommentViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
 ]
-
-

@@ -1,9 +1,8 @@
 from rest_framework import viewsets, permissions
-
-from contributors.models import Contributor
-from contributors.permissions import IsProjectAdministrator, IsProjectViewer, IsProjectAuthor
 from projects.models import Project
 from projects.serializers import ProjectSerializer
+from contributors.models import Contributor
+from contributors.permissions import IsProjectAdministrator, IsProjectAuthor, IsProjectContributor
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -17,11 +16,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             permission_classes = [permissions.IsAuthenticated]
         elif self.action in ['retrieve', 'list']:
-            permission_classes = [permissions.IsAuthenticated, IsProjectViewer]
+            permission_classes = [permissions.IsAuthenticated, IsProjectContributor]
         elif self.action in ['update', 'partial_update']:
-            permission_classes = [IsProjectAdministrator]
+            permission_classes = [permissions.IsAuthenticated, IsProjectAdministrator]
         elif self.action == 'destroy':
-            permission_classes = [IsProjectAuthor]
+            permission_classes = [permissions.IsAuthenticated, IsProjectAuthor]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]

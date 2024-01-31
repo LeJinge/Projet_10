@@ -1,15 +1,16 @@
-import uuid
-
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.db import models
+import uuid
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
-    age = models.IntegerField()
+    password = models.CharField(max_length=128)  # Champ de mot de passe
+
     can_be_contacted = models.BooleanField(default=False)
     can_be_shared = models.BooleanField(default=False)
+
     email_confirmed = models.BooleanField(default=False)
     email_confirm_token = models.UUIDField(default=uuid.uuid4)
 
@@ -20,4 +21,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-
