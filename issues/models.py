@@ -33,7 +33,7 @@ class Issue(models.Model):
     status = models.CharField(max_length=4, choices=ISSUE_STATUS, default='TODO')
     priority = models.CharField(max_length=3, choices=ISSUE_PRIORITY)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    assignee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='assignee', null=True, blank=True)
+    assignees = models.ManyToManyField(CustomUser, related_name='assigned_issues', blank=True)
 
     def __str__(self):
         return self.title

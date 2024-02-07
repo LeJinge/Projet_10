@@ -28,10 +28,10 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'auth', AuthViewSet, basename='auth')
 router.register(r'user-actions', CustomUserViewSet, basename='user-actions')
-router.register(r'projects', ProjectViewSet)
+router.register(r'projects', ProjectViewSet, basename='projects')
 router.register(r'contributors', ContributorViewSet)
 router.register(r'issues', IssueViewSet)
-router.register(r'comment', CommentViewSet)
+router.register(r'comments', CommentViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

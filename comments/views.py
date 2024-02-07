@@ -24,6 +24,9 @@ class CommentViewSet(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
     @action(detail=False, methods=['put', 'patch'], url_path='update-comment')
     def update_comment(self, request, *args, **kwargs):
         comment_id = request.data.get('id')

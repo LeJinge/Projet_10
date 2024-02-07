@@ -3,6 +3,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from users.models import CustomUser
 from .models import Issue
 from .serializers import IssueSerializer
 from contributors.permissions import IsProjectAdministrator, IsAssignee
@@ -59,3 +60,43 @@ class IssueViewSet(viewsets.ModelViewSet):
         issue = get_object_or_404(Issue, pk=issue_id)
         self.perform_destroy(issue)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['post', 'delete'], url_path='manage-assignees')
+    def manage_assignees(self, request, *args, **kwargs):
+        """
+        Ajoute ou supprime des utilisateurs de la liste des assignees.
+        Utilise la méthode POST pour ajouter, DELETE pour supprimer.
+        Les données de requête doivent inclure 'issue_id' et 'user_id'.
+        """
+        issue_id = request.data.get('issue_id')
+        user_id = request.data.get('user_id')
+
+        if not issue_id or not user_id:
+            return Response({"error": "ID de l'issue ou de l'utilisateur manquant"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            issue = Issue.objects.get(pk=issue_id)
+        except Issue.DoesNotExist:
+            return Response({"error": "Issue non trouvée"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = CustomUser.objects.get(pk=user_id)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Utilisateur non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.method == 'POST':
+            # Ajoute l'utilisateur aux assignees de l'issue
+            issue.assignees.add(user)
+            return Response({"message": "Utilisateur ajouté aux assignees"}, status=status.HTTP_200_OK)
+
+        elif request.method == 'DELETE':
+            # Supprime l'utilisateur des assignees de l'issue
+            if user in issue.assignees.all():
+                issue.assignees.remove(user)
+                return Response({"message": "Utilisateur supprimé des assignees"}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({"error": "L'utilisateur n'est pas un assignee de cette issue"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({"error": "Méthode non autorisée"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

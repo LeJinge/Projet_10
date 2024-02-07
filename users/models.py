@@ -7,6 +7,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)  # Champ de mot de passe
+    age = models.PositiveIntegerField(null=True, blank=True)
 
     can_be_contacted = models.BooleanField(default=False)
     can_be_shared = models.BooleanField(default=False)
