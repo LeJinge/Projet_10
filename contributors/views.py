@@ -29,6 +29,6 @@ class ContributorViewSet(viewsets.ModelViewSet):
             # ou un administrateur dans l'un des projets.
             return Contributor.objects.filter(
                 Q(project__author=user) |
-                Q(project__contributors__user=user, project__contributors__role='Administrator')
+                Q(project__contributor__user=user, project__contributor__role='Administrator')
             ).distinct()
         return Contributor.objects.none()

@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from users.models import CustomUser
@@ -31,6 +32,19 @@ class IssueViewSet(viewsets.ModelViewSet):
                 Q(project__contributors=user, project__contributors__role='Administrator')
             ).distinct()
         return Issue.objects.none()
+
+    def perform_create(self, serializer):
+        """
+        Définit automatiquement l'utilisateur connecté comme auteur de l'issue lors de la création.
+        """
+        serializer.save(author=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Assurez-vous que l'utilisateur a la permission de supprimer cette issue
+        if not self.check_object_permissions(request, instance):
+            raise PermissionDenied("Vous n'êtes pas autorisé à supprimer cette issue.")
 
     @action(detail=True, methods=['post', 'delete'], url_path='manage-assignees')
     def manage_assignees(self, request, *args, **kwargs):

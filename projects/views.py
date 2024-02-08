@@ -4,7 +4,7 @@ from django.db.models import Q
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from contributors.models import Contributor
-from contributors.permissions import IsProjectAdministrator, IsProjectAuthor, IsProjectContributor
+from contributors.permissions import IsProjectAdministrator, IsProjectAuthor
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -21,7 +21,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             permission_classes = [permissions.IsAuthenticated]
         elif self.action in ['retrieve', 'list']:
-            permission_classes = [permissions.IsAuthenticated, IsProjectContributor]
+            permission_classes = [permissions.IsAuthenticated]
         elif self.action in ['update', 'partial_update']:
             permission_classes = [permissions.IsAuthenticated, IsProjectAdministrator]
         elif self.action == 'destroy':
