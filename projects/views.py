@@ -1,7 +1,4 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from rest_framework import viewsets, permissions
 from django.db.models import Q
 
 from projects.models import Project
@@ -51,18 +48,3 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """
         project = serializer.save(author=self.request.user)
         Contributor.objects.create(user=self.request.user, project=project, role='Administrator')
-
-    @action(detail=True, methods=['put', 'patch'], url_path='update-project')
-    def update_project(self, request, *args, **kwargs):
-        project = self.get_object()
-        serializer = self.get_serializer(project, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=True, methods=['delete'], url_path='delete-project')
-    def delete_project(self, request, *args, **kwargs):
-        project = self.get_object()
-        self.perform_destroy(project)
-        return Response(status=status.HTTP_204_NO_CONTENT)

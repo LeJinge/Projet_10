@@ -1,15 +1,11 @@
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
+from django.db.models import Q
+from rest_framework import viewsets, permissions
 
 from comments.models import Comment
 from comments.serializers import CommentSerializer
 from contributors.permissions import IsProjectAdministrator, IsAssignee
 
 
-# Create your views here.
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -24,31 +20,21 @@ class CommentViewSet(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        """
+        Ce queryset retourne les commentaires pour lesquels l'utilisateur actuel est assigné à l'issue
+        correspondante ou est un administrateur du projet associé à l'issue.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            return Comment.objects.filter(
+                Q(issue__assignees=user) |
+                Q(issue__project__contributors__user=user, issue__project__contributors__role='Administrator')
+            ).distinct()
+        return Comment.objects.none()
+
     def perform_create(self, serializer):
+        """
+        Assigner l'utilisateur actuel comme auteur du commentaire lors de la création.
+        """
         serializer.save(author=self.request.user)
-
-    @action(detail=False, methods=['put', 'patch'], url_path='update-comment')
-    def update_comment(self, request, *args, **kwargs):
-        comment_id = request.data.get('id')
-        if not comment_id:
-            return Response({"error": "ID du Commentaire manquant"}, status=status.HTTP_400_BAD_REQUEST)
-
-        comment = get_object_or_404(Comment, pk=comment_id)
-        serializer = self.get_serializer(comment, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=False, methods=['delete'], url_path='delete-comment')
-    def delete_comment(self, request, *args, **kwargs):
-        comment_id = request.data.get('id')
-        if not comment_id:
-            return Response({"error": "ID du Commentaire manquant"}, status=status.HTTP_400_BAD_REQUEST)
-
-        comment = get_object_or_404(Comment, pk=comment_id)
-        self.perform_destroy(comment)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
