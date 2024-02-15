@@ -143,7 +143,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -160,8 +160,8 @@ SIMPLE_JWT = {
 # settings.py
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'  # Papercut utilise localhost
-EMAIL_PORT = 25  # Le port par défaut de Papercut (vérifiez s'il est différent dans votre cas)
-EMAIL_USE_TLS = False  # Pas de TLS puisque c'est un serveur local
-EMAIL_HOST_USER = ''  # Pas nécessaire pour un serveur local
-EMAIL_HOST_PASSWORD = ''  # Pas nécessaire pour un serveur local
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''

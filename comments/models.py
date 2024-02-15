@@ -1,15 +1,13 @@
 from django.db import models
-import uuid
 
 from issues.models import Issue
 from users.models import CustomUser
 
 
 class Comment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField()
-    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    issue = models.ForeignKey('issues.Issue', on_delete=models.CASCADE, related_name='issue_comments')
+    author = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, related_name='user_comments')
     creation_date = models.DateField(auto_now_add=True)
     last_update = models.DateField(auto_now=True)
 

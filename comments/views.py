@@ -1,9 +1,10 @@
 from django.db.models import Q
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
-from comments.models import Comment
-from comments.serializers import CommentSerializer
-from contributors.permissions import IsProjectAdministrator, IsAssignee
+from .models import Comment
+from .permissions import IsAuthor, IsContributor
+from .serializers import CommentSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -11,30 +12,28 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
     def get_permissions(self):
-        """
-        Retourne les permissions personnalisées en fonction de l'action.
-        """
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            permission_classes = [permissions.IsAuthenticated, IsProjectAdministrator | IsAssignee]
+        if self.action in ['create']:
+            permission_classes = [IsContributor]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsAuthor]
         else:
-            permission_classes = [permissions.IsAuthenticated]
+            permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
     def get_queryset(self):
-        """
-        Ce queryset retourne les commentaires pour lesquels l'utilisateur actuel est assigné à l'issue
-        correspondante ou est un administrateur du projet associé à l'issue.
-        """
         user = self.request.user
         if user.is_authenticated:
-            return Comment.objects.filter(
-                Q(issue__assignees=user) |
-                Q(issue__project__contributors__user=user, issue__project__contributors__role='Administrator')
-            ).distinct()
+            # Pour les actions de lecture, filtrer les commentaires soit par auteur, soit par appartenance au projet
+            # via l'issue
+            if self.action in ['list', 'retrieve']:
+                return Comment.objects.filter(
+                    Q(author=user) |
+                    Q(issue__project__contributors=user)
+                ).distinct()
+            else:
+                return super().get_queryset()
         return Comment.objects.none()
 
-    def perform_create(self, serializer):
-        """
-        Assigner l'utilisateur actuel comme auteur du commentaire lors de la création.
-        """
-        serializer.save(author=self.request.user)

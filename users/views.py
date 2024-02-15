@@ -63,7 +63,7 @@ class AuthViewSet(viewsets.ViewSet):
         serializer = CustomTokenObtainPairSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.user  # Assurez-vous que votre serializer a un moyen d'accéder à l'instance de l'utilisateur
+            user = serializer.user
             user.last_login = timezone.now()
             user.save(update_fields=['last_login'])
 
@@ -72,7 +72,6 @@ class AuthViewSet(viewsets.ViewSet):
 
     @action(methods=['post'], detail=False, permission_classes=[IsAuthenticated])
     def logout(self, request):
-        # La déconnexion se fait principalement côté client en supprimant le token
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['post'], detail=False, permission_classes=[IsAuthenticated])

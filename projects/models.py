@@ -14,8 +14,10 @@ class Project(models.Model):
     description = models.TextField()
     creation_date = models.DateField(auto_now_add=True)
     last_update = models.DateField(auto_now=True)
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='projects')
-    contributors = models.ManyToManyField('users.CustomUser', through='contributors.Contributor')
+    author = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE, related_name='authored_projects')
+    contributors = models.ManyToManyField('users.CustomUser',
+                                          through='contributors.Contributor',
+                                          related_name='contributing_projects')
     type = models.CharField(max_length=3, choices=PROJECT_TYPE)
 
     def __str__(self):
