@@ -29,7 +29,7 @@ class IssueViewSet(viewsets.ModelViewSet):
             if self.action in ['list', 'retrieve']:
                 return Issue.objects.filter(
                     Q(author=user) |
-                    Q(issue__project__contributors=user)
+                    Q(project__contributors=self.request.user)
                 ).distinct()
             else:
                 return super().get_queryset()

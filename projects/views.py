@@ -31,7 +31,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             if self.action in ['list', 'retrieve']:
                 return Project.objects.filter(
                     Q(author=user) |
-                    Q(issue__project__contributors=user)
+                    Q(contributors=user)
                 ).distinct()
             else:
                 return super().get_queryset()
